@@ -9,6 +9,8 @@ alias h='history'
 alias l='ls -A -p'
 alias ll='ls -l'
 alias la='ls -a'
+alias tm='tmux new -s kkaieda'
+alias tma='tmux attach -t kkaieda'
 alias v='vim'
 
 alias eng='LANG=C LANGUAGE=C LC_ALL=C'
