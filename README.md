@@ -2,43 +2,47 @@
 
 ## Dotfiles Manage
 
-```sh
-git init --bare $HOME/.myconf
-alias config='git --git-dir=$HOME/.myconf/ --work-tree=$HOME'
-config config status.showUntrackedFiles no
-```
-
-Home Folder で下記のように実行する
+1. dotfiles レポジトリをクローンする
 
 ```sh
-config status
-config add .vimrc
-config commit -m "Add vimrc"
-config add .config/redshift.conf
-config commit -m "Add redshift config"
-config push
+cd ~
+git clone <リポジトリURL> dotfiles
 ```
 
-## Install my dotfiles onto a new system
-
-### .bashrc or .zshrc に下記を設定(config の作成)
-
-`alias config='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'`
-
-### 再起しないように、下記を実行
-
-`echo ".dotfiles" >> .gitignore`
-
-### ファイルを $HOME に展開
-
-すでにあるファイルをコピーしようとすると、エラーが発生するので気をつけること
+2. スクリプトに実行権限をつける
 
 ```sh
-git clone --bare <git-repo-url> $HOME/.dotfiles
-config checkout
+cd ~/dotfiles
+chmod +x install.sh
+./install.sh
 ```
 
-## 参考
+## bash/zsh は、これも良さそう
 
-https://news.ycombinator.com/item?id=11071754
-https://www.atlassian.com/git/tutorials/dotfiles
+https://starship.rs/
+
+## Vim Plugins
+
+今回は採用していない
+Vim Plugin を考えるなら、VS Code を考えるべき。
+
+```sh
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+```
+
+vimrc の銭湯あたりにプラグインの管理ブロックを入れる
+
+```vimrc
+call plug#begin('~/.vim/plugged')
+
+" ここにプラグイン記載例
+Plug 'scrooloose/nerdtree'     " ファイルツリー
+Plug 'tpope/vim-commentary'    " コメントアウト補助
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'        " Fuzzy Finder
+
+call plug#end()
+```
+
+Vim を起動して `:PlugInstall` でインストール
