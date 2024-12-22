@@ -21,6 +21,10 @@ chmod +x install.sh
 
 https://starship.rs/
 
+## bash/zsh の .bashrc,.bash_profile での内容を再読み込みする。
+
+`exec $SHELL -l`
+
 ## Vim Plugins
 
 今回は採用していない
