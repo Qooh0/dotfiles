@@ -5,6 +5,7 @@ DOTFILES_DIR="$HOME/dotfiles"
 
 # リンクを作りたいファイル (必要に応じて増減してください)
 FILES=(
+  ".bash_aliases"
   ".zshrc"
   ".vimrc"
   ".tmux.conf"
