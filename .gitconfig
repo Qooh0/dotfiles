@@ -19,8 +19,8 @@
         ba = branch -a
         br = branch -r
         branch-detail-diff = diff --color master k-develop
-        ci = commit -v -S
-        cia = commit -v -S --amend
+        ci = commit -v
+        cia = commit -v --amend
         co = checkout
         cob = checkout -b # 新しいブランチで開発
         cok = checkout -b k-develop master
