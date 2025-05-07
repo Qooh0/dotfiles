@@ -33,4 +33,6 @@ for file in "${FILES[@]}"; do
   echo "Created symlink: $HOME/$file -> $DOTFILES_DIR/$file"
 done
 
+exec -l $SHELL
+
 echo "All done!"

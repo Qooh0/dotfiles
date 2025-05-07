@@ -1,6 +1,7 @@
 [user]
         name = Kaieda Kensuke
         email = kaieda.kensuke@qadiff.com
+	signingkey = B3837D6173F554DE5B92F1A05D1891F3AF05B081
 [color]
         ui = auto
         diff = auto
@@ -89,3 +90,14 @@
         smudge = git-lfs smudge -- %f
 [init]
         defaultBranch = main
+[commit]
+	gpgsign = true
+[tag]
+	gpgSign = true
+[safe]
+	directory = C:/Users/KensukeKaieda/source/
+	directory = C:/Users/KensukeKaieda/source/qadiff-hp
+[push]
+	autoSetupRemote = true
+[fetch]
+	prune = true

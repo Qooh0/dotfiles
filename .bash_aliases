@@ -5,6 +5,7 @@ alias df="df -h"
 alias duh="du -h ./ --max-depth=1"
 alias g='git'
 alias gr='grep --color=auto -ERUIn'
+alias gitlessSync='function _gitless_sync() { if [ -f "$1/.gitignore" ]; then rsync -a --exclude=".git" --exclude-from="$1/.gitignore" "$1/" "$2"; else rsync -a --exclude=".git" "$1/" "$2"; fi; }; _gitless_sync'
 alias h='history'
 alias l='ls -A -p'
 alias ll='ls -l'
