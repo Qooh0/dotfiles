@@ -59,7 +59,7 @@ git_info() {
 
 # --- 2行Powerlineプロンプト（Gitディレクトリのみブロック追加）---
 PROMPT='
-%F{black}%K{blue} %~ %k%F{blue}%f\
+%F{white}%K{blue} %~ %k%F{blue}%f\
 $(git rev-parse --is-inside-work-tree >/dev/null 2>&1 && \
   print -n "%F{black}%K{magenta}  $(git_info) %k%F{magenta}%f")\
 %F{blue}
