@@ -1,13 +1,21 @@
 # ───────────────────────────────────────
-# 1) zsh の初期読み込み
-autoload -Uz compinit && compinit         # 補完機能を有効化
-autoload -Uz colors && colors             # 色を使えるように
-export LSCOLORS="GxBxhxDxfxhxhxhxhxhxx"   # カラーを設定
-setopt prompt_subst                       # プロンプト内の変数展開を有効に
-
 # ==== Platform detection ====
 _is_macos() { [[ "$(uname -s)" == "Darwin" ]]; }
 _is_linux() { [[ "$(uname -s)" == "Linux" ]]; }
+
+# 1) zsh の初期読み込み
+autoload -Uz compinit && compinit         # 補完機能を有効化
+autoload -Uz colors && colors             # 色を使えるように
+if _is_linux; then
+  export LSCOLORS="GxBxhxDxfxhxhxhxhxhxx"   # カラーを設定
+fi
+if _is_macos; then
+  # macOS 専用の色。22 文字（11ペア）
+  export LSCOLORS="exfxcxdxbxegedabagacad"
+  export CLICOLOR=1
+  alias ls='ls -G'
+fi
+setopt prompt_subst                       # プロンプト内の変数展開を有効に
 
 # 2) 履歴関連・入力関連の設定
 HISTFILE=~/.zsh_history
