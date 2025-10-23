@@ -11,7 +11,7 @@ if _is_linux; then
 fi
 if _is_macos; then
   # macOS 専用の色。22 文字（11ペア）
-  export LSCOLORS="exfxcxdxbxegedabagacad"
+  export LSCOLORS="ExFxCxDxBxegedabagacad"
   export CLICOLOR=1
   alias ls='ls -G'
 fi
@@ -86,6 +86,10 @@ if _is_linux; then
   ssh-add ~/.ssh/id_ed25519
 fi
 
+# 8) GPG
+export GPG_TTY=$(tty)
+export PINENTRY_USER_DATA="ttyname=$(tty)"
+
 # ───────────────────────────────────────
 
 # ───────────────────────────────────────
@@ -118,4 +122,9 @@ if ! [ -S "$SSH_AUTH_SOCK" ]; then
   fi
 fi
 # ───────────────────────────────────────
+
+# Rust (rustup) がインストールされている場合のみ読み込む
+if [ -f "$HOME/.cargo/env" ]; then
+  source "$HOME/.cargo/env"
+fi
 

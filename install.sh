@@ -35,4 +35,7 @@ done
 
 exec -l $SHELL
 
+# vim backup directories
+mkdir -p ~/.cache/vim/{backup,swap,undo}
+
 echo "All done!"

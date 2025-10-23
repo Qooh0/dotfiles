@@ -101,3 +101,5 @@
 	autoSetupRemote = true
 [fetch]
 	prune = true
+[gpg]
+	program = /opt/homebrew/bin/gpg

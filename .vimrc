@@ -30,9 +30,9 @@ set clipboard=unnamedplus
 
 " Undo/backup
 set undofile
-set undodir=~/.vim/undo//
-set backupdir=~/.vim/backup//
-set directory=~/.vim/swap//
+set undodir=~/.cache/vim/undo//
+set backupdir=~/.cache/vim/backup//
+set directory=~/.cache/vim/swap//
 
 " 分割の向き＆移動
 set splitright splitbelow
