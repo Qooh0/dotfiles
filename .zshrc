@@ -133,3 +133,26 @@ if [ -f "$HOME/.cargo/env" ]; then
   source "$HOME/.cargo/env"
 fi
 
+# ===== mise (最優先・自動切替) =====
+# # Homebrew が /opt/homebrew の場合（Apple Silicon）
+if [ -x "$(command -v mise)" ]; then
+    eval "$(mise activate zsh)"     # PATH をいい感じにセット（shims を先頭へ）
+fi
+
+# ===== nvm（必要時に明示 use） =====
+export NVM_DIR="$HOME/.nvm"
+# Homebrew に入ってる nvm.sh の位置。Intel Mac は /usr/local/opt/nvm/nvm.sh のことも。
+if [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
+    # 自動ロードはせず、nvm コマンドを使う時だけ読み込む（遅延ロード）
+    nvm() {
+      unset -f nvm
+      . "/opt/homebrew/opt/nvm/nvm.sh"
+      nvm "$@"
+    }
+fi
+
+# ===== Corepack（npm同梱: pnpm / yarn の管理） =====
+if command -v corepack >/dev/null 2>&1; then
+    corepack enable >/dev/null 2>&1 || true
+fi
+
