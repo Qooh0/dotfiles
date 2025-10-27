@@ -55,7 +55,12 @@ fi
 git_info() {
   local b dirty ab stat ahead behind
   b=$(git symbolic-ref --short HEAD 2>/dev/null) || return 0
-  git diff --quiet --ignore-submodules HEAD 2>/dev/null || dirty="*"
+  # 変更有無だけ知りたいなら diff ではなく status --porcelain が安全
+  if ! git status --porcelain --ignore-submodules >/dev/null 2>&1; then
+    : # 存在しないリポ等のときは何もしない
+  else
+    [[ -n "$(git status --porcelain --ignore-submodules)" ]] && dirty="*"
+  fi
   stat=$(git rev-list --left-right --count @{upstream}...HEAD 2>/dev/null)
   if [[ -n $stat ]]; then
     ahead=${stat#*	}; behind=${stat%%	*}
