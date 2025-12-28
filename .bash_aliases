@@ -34,15 +34,6 @@ alias grepk='grep -i -r -H -n -I'
 # find sample
 # find /hoge -name '*.c' -print | xargs grep 'search string'
 
-# クリップボード（WSL/Ubuntu/mac をゆるく吸収）
-if command -v pbcopy >/dev/null 2>&1; then
-  alias clip='pbcopy'
-elif command -v xclip >/dev/null 2>&1; then
-  alias clip='xclip -selection clipboard'
-elif command -v clip.exe >/dev/null 2>&1; then
-  alias clip='clip.exe'
-fi
-
 # Archive extraction (with zstd support)
 extract() {
   [[ -f "$1" ]] || { echo "'$1' is not a valid file!"; return 1; }

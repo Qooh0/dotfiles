@@ -14,6 +14,8 @@
 | `C-t D` | デュアルAIレイアウト（Claude vs Aider 比較用） |
 | `C-t V` | レビューレイアウト（コード70% + AI 30%） |
 | `C-t C` | ペイン内容をクリップボードへキャプチャ（直近3000行） |
+| `C-t W` | Worktree + tmuxセッション作成（ブランチ名を入力） |
+| `C-t R` | ペイン録画開始/停止（~/.tmux/recordings/に保存） |
 | `C-t \|` | 縦分割 |
 | `C-t -` | 横分割 |
 | `C-t z` | ペインのズーム/解除 |
@@ -57,6 +59,25 @@
 | `g wtb <branch>` | 新worktreeをブランチ名で作成（../repo-branch に配置） |
 | `wtcd` | fzf で worktree 選択・移動 |
 | `wtstat` | 全 worktree の状態確認 |
+
+### AI 開発支援コマンド
+
+| コマンド | 説明 |
+|----------|------|
+| `ai_workflow` | 3ステップワークフローのリマインダー表示 |
+| `tree_ai [depth]` | AIに渡しやすいファイルツリー出力（デフォルト深さ3） |
+| `cat_ai file1 file2...` | 複数ファイルをAI向けに出力 |
+| `git_summary_ai` | Git状態サマリー（status + log + staged） |
+| `cclog` | ログ付きClaude起動（~/.claude/logs/に保存） |
+| `claude-md` | ./CLAUDE.md をエディタで開く |
+
+### Git AI エイリアス
+
+| コマンド | 説明 |
+|----------|------|
+| `g diff-ai` | コンテキスト多めのdiff（色なし、-U10） |
+| `g changed-files` | 変更ファイル一覧 |
+| `g show-ai` | 最新コミットをAI向けに表示 |
 
 ### 便利コマンド
 
@@ -350,3 +371,85 @@ tma    # tmux attach -t kkaieda
 
 - `Ctrl+R`: コマンド履歴をfzf検索
 - `Ctrl+T`: ファイルをfzf検索してコマンドラインに挿入
+
+---
+
+## 9. Claude Code スラッシュコマンド
+
+private_dotfiles で定義されるカスタムコマンド。
+
+### /review
+
+コードレビューを依頼:
+
+```
+/review src/components/Auth.tsx
+```
+
+観点:
+- バグ・エラー
+- セキュリティ
+- パフォーマンス
+- 可読性
+- テストカバレッジ
+
+### /explain
+
+コードの解説を依頼:
+
+```
+/explain src/utils/parser.ts
+```
+
+出力:
+- 何をしているか
+- なぜそうしているか
+- 使われているパターン
+
+### /test
+
+テスト作成を依頼:
+
+```
+/test src/services/api.ts
+```
+
+作成されるテスト:
+- 正常系
+- 異常系・エッジケース
+- モック設定
+
+---
+
+## 10. ペイン録画
+
+tmux のペイン録画機能で AI との対話を保存。
+
+### 使い方
+
+```bash
+# 録画開始
+C-t R  # "Recording started" と表示
+
+# 作業...
+
+# 録画停止
+C-t R  # "Recording stopped" と表示
+```
+
+### 保存場所
+
+```
+~/.tmux/recordings/
+├── main-0-0-20241229-143052.log
+├── feature-1-0-20241229-150123.log
+└── ...
+```
+
+ファイル名: `{セッション名}-{ウィンドウ}-{ペイン}-{日時}.log`
+
+### 活用例
+
+- AI との対話を振り返る
+- 問題解決の過程を記録
+- ペアプログラミングのログ
