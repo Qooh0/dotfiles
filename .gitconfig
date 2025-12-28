@@ -1,0 +1,140 @@
+[user]
+        name = Kaieda Kensuke
+        email = kaieda.kensuke@qadiff.com
+[include]
+        path = ~/.gitconfig.local
+
+[color]
+        ui = auto
+        diff = auto
+        branch = auto
+        grep = auto
+[core]
+        excludesfile = ~/.gitignore
+        autoSetupRemote = true
+        editor = vim
+        ; autocrlf = input # CRLF 自動変換
+        pager = less
+
+[branch]
+        sort = -committerdate
+[diff]
+        algorithm = histogram
+
+[fetch]
+	prune = true
+
+[filter "lfs"]
+        process = git-lfs filter-process
+        required = true
+        clean = git-lfs clean -- %f
+        smudge = git-lfs smudge -- %f
+
+[gpg]
+	# program is set in ~/.gitconfig.local (platform-specific)
+	format = ssh
+
+[init]
+        defaultBranch = main
+
+[log]
+        date = iso-local
+
+[help]
+        autocorrect = prompt
+
+[merge]
+    conflictstyle = diff3
+    ff = false
+
+[pull]
+        rebase = true
+
+[push]
+	autoSetupRemote = true
+
+[rebase]
+        autosquash = true
+[rerere]
+        enabled = true
+
+
+[alias]
+        ad = add
+        au = add -u
+        ap = add -p
+        b = branch
+        ba = branch -a
+        br = branch -r
+        branch-detail-diff = diff --color master k-develop
+        ci = commit -v
+        cia = commit -v --amend
+        co = checkout
+        cob = checkout -b # 新しいブランチで開発
+        cok = checkout -b k-develop master
+        d = diff
+        dc = diff --cached
+        dh = diff HEAD
+        dhh = diff HEAD~
+        dh2 = diff HEAD~~
+        dh3 = diff HEAD~~~
+        dh4 = diff HEAD~~~~
+        dm = diff master
+        f = fetch
+        fix = commit --amend
+        la  = log --pretty=\"format:%ad %h (%an): %s\" --date=short  # ざっくりログ出す
+        less = show # 後ろにこれな <hash>:<path>
+        logp = log -p --pretty=short
+        logfiles = log --numstat # ファイル名を出力
+        log-graph = log --graph --date=short --pretty=format:'%Cgreen%h %cd %Cblue%cn %Creset%s'
+        m = merge --no-ff
+        po = push origin
+        pom = push origin master
+        remotePrune = remote prune origin
+        rbm = rebase master 
+        rbk = rebase k-develop
+        rbc = rebase --continue
+        rba = rebase --abort
+        rbi = rebase -i
+        rbi1 = rebase -i HEAD~
+        rbi2 = rebase -i HEAD~2
+        rbi3 = rebase -i HEAD~3
+        rbi4 = rebase -i HEAD~4
+        rbi5 = rebase -i HEAD~5
+        rs   = reset
+        rs1  = reset HEAD~  # 最新のcommitを削除する
+        rs2  = reset HEAD~2 # 最新と一つ前の commit を削除する
+        rs3  = reset HEAD~3
+        rs4  = reset HEAD~4
+        rs5  = reset HEAD~5
+        s = status
+        ss = status -s
+        t = tag
+        ta = tag -a
+        td = tag -d
+        tl = tag -l
+        taglist = tag -l -n
+        tr = log --graph --pretty='format:%C(yellow)%h%Creset %s %Cgreen(%an)%Creset %Cred%d%Creset'
+
+        # edit関連
+        # modified or untrackedなファイルを編集する
+        edit = "!f() { git status -s | cut -b 4- | grep -v '\\/$' | uniq ; }; vim `f`"
+        # mergeの際にconflictが起きたファイルを編集
+        edit-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; vim `f`"
+        # mergeの際にconflictが起きたファイルをadd
+        add-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`"
+        delete-unmerged = "!f() { git ls-files --deleted | cut -f2 | sort -u ; }; git rm `f`"
+        # 指定したコミットで変更されたファイルを編集する
+        modified = "!f() { git diff $1..$1\\^ --name-only | xargs sh -c 'vim "$@" < /dev/tty' - ;}; f"
+
+        delete-merged-branches = !git branch --merged | grep -v \\* | xargs -i % git branch -d %
+
+        # ===== Worktree Commands =====
+        wt = worktree
+        wtl = worktree list
+        wta = worktree add
+        wtr = worktree remove
+        wtp = worktree prune
+        # Quick worktree add with new branch: git wtb feature/new-feature
+        wtb = "!f() { git worktree add -b \"$1\" \"../$(basename $(pwd))-$1\" \"${2:-HEAD}\"; }; f"
+

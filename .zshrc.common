@@ -1,0 +1,311 @@
+# # OSC応答を読み捨てる（tmux環境向け）
+if [[ -n "$TMUX" ]]; then
+  # 入力バッファをクリア
+    while read -t 0.01 -k 1 -s; do :; done 2>/dev/null
+fi
+
+# ───────────────────────────────────────
+# ==== Platform detection ====
+_is_macos() { [[ "$(uname -s)" == "Darwin" ]]; }
+_is_linux() { [[ "$(uname -s)" == "Linux" ]]; }
+_is_wsl() {
+    grep -qi "microsoft" /proc/version 2>/dev/null
+}
+
+
+# 1) zsh の初期読み込み
+autoload -Uz compinit && compinit         # 補完機能を有効化
+autoload -Uz colors && colors             # 色を使えるように
+autoload -Uz add-zsh-hook                 # フック管理
+setopt prompt_subst                       # プロンプト内の変数展開を有効に
+
+# ==== ls color ====
+if _is_macos; then
+  # macOS/BSD ls は --color ではなく -G、配色は LSCOLORS (22文字/11ペア)
+  export LSCOLORS="ExFxCxDxBxegedabagacad"
+  export CLICOLOR=1
+  alias ls='ls -G'
+
+  # Added by LM Studio CLI (lms)
+  export PATH="$PATH:/Users/qooh0/.lmstudio/bin"
+  # End of LM Studio CLI section
+else
+  # GNU ls (Linux)
+  export LS_COLORS="di=34:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43"
+  alias ls='ls --color=auto'
+fi
+
+# 2) 履歴関連・入力関連の設定
+HISTFILE=~/.zsh_history
+setopt appendhistory     # 終了時にヒストリを追記
+setopt incappendhistory  # コマンド実行ごとに即ヒストリ保存
+setopt histignoredups    # 直前と同じコマンドを重複しない
+setopt histignorespace   # 先頭にスペースで始まるコマンドはヒストリに残さない
+bindkey -e	         # Emacs ライクなキーバインド
+
+# 3) パス・ユーザディレクトリの補助
+if [ -d "$HOME/.local/bin" ]; then
+  path+=("$HOME/.local/bin")
+fi
+if [ -d "$HOME/bin" ]; then
+  path+=("$HOME/bin")
+fi
+
+# 4) エイリアス
+if [ -f "$HOME/.bash_aliases" ]; then
+  source $HOME/.bash_aliases
+fi
+
+# 6) 区切り文字変更
+# デフォルトから安全に削除したい記号を除外
+WORDCHARS='*?_.[]~=&;!#$%^(){}<>'
+
+# 7) GPG
+export GPG_TTY=$(tty)
+export PINENTRY_USER_DATA="ttyname=$(tty)"
+
+# ───────────────────────────────────────
+# 日本語フォント・端末設定への配慮
+# （端末エミュレータ側でフォントに日本語・Nerdフォント等確保を推奨）
+
+# 端末のタイトルに現在ディレクトリを表示（add-zsh-hook で安全に追加）
+_set_terminal_title() { print -Pn "\e]0;%n@%m: %~\a" }
+case $TERM in
+  xterm*|rxvt*|tmux*)
+    add-zsh-hook precmd _set_terminal_title
+    ;;
+esac
+# ───────────────────────────────────────
+
+# ───────────────────────────────────────
+# SSH agent 自動起動（統合版：macOS/Linux/WSL対応）
+if [ -z "$SSH_AUTH_SOCK" ]; then
+  export SSH_AUTH_SOCK="$HOME/.ssh/agent.sock"
+fi
+
+# すでにエージェントが動いているか確認
+if ! [ -S "$SSH_AUTH_SOCK" ]; then
+  echo "Starting ssh-agent..."
+  eval "$(ssh-agent -a $SSH_AUTH_SOCK)" >/dev/null 2>&1
+  # 鍵を自動登録（ファイルが存在すれば）
+  if [ -f ~/.ssh/id_ed25519 ]; then
+    ssh-add ~/.ssh/id_ed25519 >/dev/null 2>&1
+  fi
+fi
+# ───────────────────────────────────────
+
+# ───────────────────────────────────────
+if _is_wsl; then
+    # Windows home
+    export WINHOME="/mnt/c/Users/KensukeKaieda"
+    export WINDOWNLOADS="$WINHOME/Downloads"
+
+    alias cdwin='cd $WINHOME'
+
+    # Clipboard
+    alias pbcopy='clip.exe'
+    alias pbpaste='powershell.exe -command "Get-Clipboard"'
+
+    # VS Code launcher
+    alias code="/mnt/c/Users/KensukeKaieda/AppData/Local/Programs/Microsoft VS Code/bin/code"
+
+    # Browser open
+    alias open='powershell.exe /c start'
+
+    # Docker Desktop
+    export DOCKER_HOST=unix:///mnt/wsl/docker-desktop/shared-sockets/cli.sock
+
+    # path converters
+    # winpath .
+    # linpath "C:\Users\xxx\Downloads"
+    alias winpath='wslpath -w'
+    alias linpath='wslpath -u'
+
+    # Windows PATH
+    export PATH="$PATH:/mnt/c/Windows/System32:/mnt/c/Windows"
+
+    # explorer (use 'open' or 'explore', not 'ex' to avoid conflict with extract)
+    alias explore='explorer.exe'
+
+    # temp dir
+    export TMPDIR="$WINHOME/AppData/Local/Temp"
+
+    # hostname
+    export HOSTNAME="wsl"
+fi
+# ───────────────────────────────────────
+
+
+# Rust (rustup) がインストールされている場合のみ読み込む
+if [ -f "$HOME/.cargo/env" ]; then
+  source "$HOME/.cargo/env"
+fi
+
+# ===== mise (最優先・自動切替) =====
+# # Homebrew が /opt/homebrew の場合（Apple Silicon）
+if [ -x "$(command -v mise)" ]; then
+    eval "$(mise activate zsh)"     # PATH をいい感じにセット（shims を先頭へ）
+fi
+
+# ===== nvm（必要時に明示 use） =====
+export NVM_DIR="$HOME/.nvm"
+# Homebrew に入ってる nvm.sh の位置。Intel Mac は /usr/local/opt/nvm/nvm.sh のことも。
+if [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
+    # 自動ロードはせず、nvm コマンドを使う時だけ読み込む（遅延ロード）
+    nvm() {
+      unset -f nvm
+      . "/opt/homebrew/opt/nvm/nvm.sh"
+      nvm "$@"
+    }
+fi
+
+# ===== Corepack（npm同梱: pnpm / yarn の管理） =====
+if command -v corepack >/dev/null 2>&1; then
+    corepack enable >/dev/null 2>&1 || true
+fi
+
+# ───────────────────────────────────────
+# Cross-Platform Clipboard (統一クリップボード)
+# ───────────────────────────────────────
+clip() {
+  if _is_macos; then pbcopy
+  elif _is_wsl; then clip.exe
+  elif command -v xclip >/dev/null 2>&1; then xclip -selection clipboard
+  elif command -v xsel >/dev/null 2>&1; then xsel -bi
+  else echo "No clipboard tool available" >&2; cat >/dev/null; fi
+}
+
+paste() {
+  if _is_macos; then pbpaste
+  elif _is_wsl; then powershell.exe -command "Get-Clipboard" | tr -d '\r'
+  elif command -v xclip >/dev/null 2>&1; then xclip -selection clipboard -o
+  elif command -v xsel >/dev/null 2>&1; then xsel -bo
+  else echo "No clipboard tool available" >&2; fi
+}
+
+# ───────────────────────────────────────
+# AI 開発支援
+# ───────────────────────────────────────
+
+# Claude Code エイリアス
+if command -v claude >/dev/null 2>&1; then
+  alias cc='claude'
+  alias ccc='claude --continue'
+  alias ccr='claude --resume'
+fi
+
+# Aider エイリアス (Claude Max プラン向け)
+if command -v aider >/dev/null 2>&1; then
+  alias ai='aider --model claude-sonnet-4-20250514'   # デフォルト: Sonnet 4
+  alias aio='aider --model claude-opus-4-20250514'    # 最高性能: Opus 4
+  alias aia='aider --chat-mode ask'                    # 質問のみ（コード変更なし）
+fi
+
+# プロジェクトルートへ素早く移動
+alias cdr='cd $(git rev-parse --show-toplevel 2>/dev/null || echo .)'
+
+# git diff を AI に渡しやすい形式で出力（色なし）
+alias gdai='git diff --no-color'
+alias gdsai='git diff --staged --no-color'
+
+# diff をクリップボードへコピー
+gdclip() { git diff --no-color "$@" | clip && echo "Diff copied to clipboard"; }
+gdsclip() { git diff --staged --no-color "$@" | clip && echo "Staged diff copied to clipboard"; }
+
+# プロジェクトコンテキスト表示
+_ai_context() {
+  echo "=== Project: $(basename $(git rev-parse --show-toplevel 2>/dev/null || pwd)) ==="
+  echo "--- Git Status ---"; git status -s 2>/dev/null | head -10
+  echo "--- Recent Commits ---"; git log --oneline -5 2>/dev/null
+  echo "--- Key Files ---"; ls -la *.md *.json 2>/dev/null | head -5
+}
+
+# AI ツール選択メニュー (fzf 必須)
+ais() {
+  command -v fzf >/dev/null 2>&1 || { echo "fzf required for ais menu"; return 1; }
+
+  local choice=$(cat <<'EOF' | fzf --height 50% --border --header "AI Tool Selector"
+claude        : Claude Code (会話継続)
+claude-new    : Claude Code (新規セッション)
+aider-sonnet  : Aider + Claude Sonnet 4 (推奨・コスパ最強)
+aider-opus    : Aider + Claude Opus 4 (最高性能)
+aider-ask     : Aider 質問モード (コード変更なし)
+copilot       : GitHub Copilot CLI
+cursor        : Cursor エディタを開く
+diff-copy     : git diff をクリップボードへ
+context       : プロジェクト情報を表示
+EOF
+)
+
+  case "${choice%%:*}" in
+    claude)        claude --continue ;;
+    claude-new)    claude ;;
+    aider-sonnet)  aider --model claude-sonnet-4-20250514 ;;
+    aider-opus)    aider --model claude-opus-4-20250514 ;;
+    aider-ask)     aider --chat-mode ask ;;
+    copilot)       gh copilot ;;
+    cursor)        cursor . ;;
+    diff-copy)     git diff --no-color | clip && echo "Diff copied" ;;
+    context)       _ai_context ;;
+  esac
+}
+
+# ───────────────────────────────────────
+# Git Worktree ナビゲーション
+# ───────────────────────────────────────
+
+# fzf でワークツリー選択・移動
+wtcd() {
+  command -v fzf >/dev/null 2>&1 || { git worktree list; return 1; }
+  local sel=$(git worktree list | fzf --height 40% --reverse | awk '{print $1}')
+  [[ -n "$sel" ]] && cd "$sel"
+}
+
+# 全ワークツリーの状態確認
+wtstat() {
+  git worktree list | while read line; do
+    local dir=$(echo "$line" | awk '{print $1}')
+    local branch=$(echo "$line" | awk '{print $3}' | tr -d '[]')
+    echo "=== $branch ($dir) ==="
+    git -C "$dir" status -s 2>/dev/null | head -5
+    echo ""
+  done
+}
+
+# ───────────────────────────────────────
+# fzf 連携（履歴検索の強化）
+# ───────────────────────────────────────
+if command -v fzf >/dev/null 2>&1; then
+  # Ctrl+R で履歴をfzf検索
+  function fzf-history() {
+    local selected
+    selected=$(fc -rl 1 | fzf --tac --no-sort --query "$LBUFFER" \
+      --preview 'echo {}' --preview-window=up:3:wrap)
+    if [[ -n "$selected" ]]; then
+      BUFFER="${selected#*  }"  # 行番号を除去
+      CURSOR=$#BUFFER
+    fi
+    zle redisplay
+  }
+  zle -N fzf-history
+  bindkey '^R' fzf-history
+
+  # Ctrl+T でファイルをfzf検索してコマンドラインに挿入
+  function fzf-file() {
+    local selected
+    selected=$(find . -type f 2>/dev/null | fzf --preview 'head -100 {}')
+    if [[ -n "$selected" ]]; then
+      LBUFFER+="$selected"
+    fi
+    zle redisplay
+  }
+  zle -N fzf-file
+  bindkey '^T' fzf-file
+else
+  # fzf 未インストール時のヒント
+  _fzf_hint() {
+    echo "fzf not installed. Install with:"
+    _is_macos && echo "  brew install fzf"
+    _is_linux && echo "  sudo apt install fzf  # or your package manager"
+  }
+fi

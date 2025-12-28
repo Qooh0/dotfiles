@@ -1,0 +1,17 @@
+# Linux 
+
+[user]
+    # SSH 署名用公開鍵のパス
+    signingkey = ~/.ssh/id_ed25519.pub
+
+[gpg]
+    format = ssh
+
+[commit]
+    gpgsign = true
+
+[tag]
+    gpgsign = true
+
+[credential]
+    helper = cache --timeout=3600

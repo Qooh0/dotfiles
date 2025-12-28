@@ -1,0 +1,9 @@
+# 撮影時は履歴を残さない／小さくする などもアリ
+HISTSIZE=1000
+SAVEHIST=0
+unsetopt sharehistory incappendhistory   # 共有ヒストリ切る
+
+PROMPT='%F{green}%~%f %# '
+
+# --- 右側に日付＋時刻 ---
+# RPROMPT='%F{yellow}%D{%Y-%m-%d %H:%M:%S}%f'
