@@ -1,0 +1,27 @@
+# Git ローカル設定
+
+[user]
+    # SSH 署名用公開鍵のパス
+    signingkey = ~/.ssh/id_ed25519.pub
+
+[gpg]
+    format = ssh
+
+[commit]
+    gpgsign = true
+
+[tag]
+    gpgsign = true
+
+# 環境別の credential 設定を読み込む
+# Mac: /Users/ で始まるパス
+[includeIf "gitdir:/Users/"]
+    path = ~/.gitconfig.credential.mac
+
+# Linux: /home/ で始まるパス
+[includeIf "gitdir:/home/"]
+    path = ~/.gitconfig.credential.linux
+
+# Windows: C:/ で始まるパス
+[includeIf "gitdir:C:/"]
+    path = ~/.gitconfig.credential.windows
