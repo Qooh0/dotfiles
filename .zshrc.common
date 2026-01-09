@@ -275,14 +275,29 @@ wtstat() {
 # ───────────────────────────────────────
 # fzf 連携（履歴検索の強化）
 # ───────────────────────────────────────
+# 使い方:
+#   Ctrl+R    : 履歴検索を開始
+#   (検索中)
+#     Ctrl+R  : 次の候補へ（古い方向）
+#     Ctrl+S  : 前の候補へ（新しい方向）
+#     Ctrl+/  : プレビュー表示/非表示
+#     Enter   : 選択してコマンドラインに挿入
+#     Esc     : キャンセル
+#   Ctrl+T    : ファイル検索してパスを挿入
+# ───────────────────────────────────────
 if command -v fzf >/dev/null 2>&1; then
   # Ctrl+R で履歴をfzf検索
   function fzf-history() {
     local selected
-    selected=$(fc -rl 1 | fzf --tac --no-sort --query "$LBUFFER" \
-      --preview 'echo {}' --preview-window=up:3:wrap)
+    # 重複排除 + 行番号を事前に除去してスッキリ表示
+    selected=$(fc -rl 1 | sed 's/^[[:space:]]*[0-9]*[[:space:]]*//' | awk '!seen[$0]++' | \
+      fzf --no-sort --query "$LBUFFER" \
+        --height 40% --reverse --border --cycle \
+        --prompt "History> " \
+        --bind 'ctrl-r:down,ctrl-s:up,ctrl-/:toggle-preview' \
+        --preview 'echo {}' --preview-window=down:3:wrap:hidden)
     if [[ -n "$selected" ]]; then
-      BUFFER="${selected#*  }"  # 行番号を除去
+      BUFFER="$selected"
       CURSOR=$#BUFFER
     fi
     zle redisplay

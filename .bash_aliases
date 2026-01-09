@@ -12,7 +12,7 @@ if command -v colordiff >/dev/null 2>&1; then
   alias diff='colordiff'
 fi
 alias gitlessSync='function _gitless_sync() { if [ -f "$1/.gitignore" ]; then rsync -a --exclude=".git" --exclude-from="$1/.gitignore" "$1/" "$2"; else rsync -a --exclude=".git" "$1/" "$2"; fi; }; _gitless_sync'
-alias h='history'
+alias h='history 1'
 export LESS='-R'               # ANSI color を通す
 export LESSHISTFILE=-
 alias l='ls -A -p'
