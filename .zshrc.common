@@ -85,6 +85,8 @@ fi
 
 # すでにエージェントが動いているか確認
 if ! [ -S "$SSH_AUTH_SOCK" ]; then
+  # 古いソケットファイル（dangling symlink等）が残っていたら削除
+  [ -e "$SSH_AUTH_SOCK" ] || [ -L "$SSH_AUTH_SOCK" ] && rm -f "$SSH_AUTH_SOCK"
   echo "Starting ssh-agent..."
   eval "$(ssh-agent -a $SSH_AUTH_SOCK)" >/dev/null 2>&1
   # 鍵を自動登録（ファイルが存在すれば）
