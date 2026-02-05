@@ -2,6 +2,8 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias d="diff -uprN"
+alias dev="devcontainer exec --workspace-folder . -- zsh"
+alias devup="devcontainer up --workspace-folder ."
 alias df="df -h"
 alias du="du -h"
 alias duh="du -h ./ --max-depth=1"
