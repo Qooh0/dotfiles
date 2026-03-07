@@ -31,7 +31,7 @@ set signcolumn=yes
 set updatetime=300
 
 " クリップボード（WSL/Win/Mac でシステム共有）
-set clipboard=unnamedplus
+set clipboard=unnamed,unnamedplus
 
 " Undo/backup
 set undofile

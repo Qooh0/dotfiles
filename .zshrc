@@ -16,3 +16,5 @@ case "$ZSH_PROFILE" in
     [ -f "$HOME/.zshrc.daily" ] && source "$HOME/.zshrc.daily"
     ;;
 esac
+
+[ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"

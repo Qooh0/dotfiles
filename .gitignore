@@ -19,3 +19,7 @@ ehthumbs.db
 # Shell history
 .zsh_history
 .bash_history
+
+# zshrc local sttings(override)
+.zshrc.local
+
