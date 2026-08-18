@@ -24,8 +24,12 @@ alias lS='ls -lahS'       # サイズ順
 alias lt='ls -laht'       # 更新時刻降順（直近の更新を先頭に）
 alias l1='ls -1A'         # 1列表示
 mkcd() { mkdir -p -- "$1" && cd "$1"; }	# ディレクトリ作成して移動
-alias tm='tmux new -s kkaieda'
-alias tma='tmux attach -t kkaieda'
+alias tm='tmux new-session -A -s kkaieda'
+alias tmux-list='tmux ls'
+alias tmux-kill='tmux kill-session -t kkaieda'
+alias tmux-current='tmux display-message -p "#S"'
+alias tmux-status='tmux ls 2>/dev/null || echo "No tmux sessions"'
+alias tmux-reset='tmux kill-session -t kaieda-dev 2>/dev/null; tmux new-session -d -s kkaieda'
 alias v='vim'
 
 alias eng='LANG=C LANGUAGE=C LC_ALL=C'
